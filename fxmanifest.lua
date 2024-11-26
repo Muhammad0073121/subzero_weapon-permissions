@@ -3,7 +3,7 @@ game 'gta5'
 
 Author 'subzer0_07#0000'
 version '1.0.0'
-scriptname 'subzero_weapon-permission-ox'
+scriptname 'subzero_item-use-permission-ox'
 
 
 server_scripts {
@@ -17,4 +17,4 @@ escrow_ignore {
     'config.lua',
 }
 
-dependency 'ox_inventory'
+dependency {'ox_inventory', 'qb-core'}
