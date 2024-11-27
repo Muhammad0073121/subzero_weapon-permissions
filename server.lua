@@ -2,6 +2,7 @@ local QBCore = exports['qb-core']:GetCoreObject()
 local Config =  {
     {
         name = "WEAPON_CARBINERIFLE",
+        allowAll = false,
         job = {"police"},
         gang = {},
     }
@@ -13,11 +14,14 @@ AddEventHandler('ox_inventory:usedItem', function(playerId, name, slotId, metada
     local job = player.PlayerData.job.name
     local gang = player.PlayerData.gang.name
 
+    if not string.match(name, "WEAPON_") then return end
+
     if not player then return end
-    if not has_value(Config, name, "name") then return end
+    if not has_value(Config, name, "name") then goto remove end
 
     for _, weaponConfig in ipairs(Config) do
         if weaponConfig.name == name then
+            if weaponConfig.allowAll then return end
             if #weaponConfig.job ~=0 then
                 if has_value(weaponConfig.job, job) then return end
             end
@@ -26,8 +30,13 @@ AddEventHandler('ox_inventory:usedItem', function(playerId, name, slotId, metada
             end
         end
     end
-    TriggerClientEvent('QBCore:Notify', src, 'You are not allowed to use this item', 'error')
-    TriggerClientEvent('ox_inventory:disarm', playerId, true)
+    ::remove::
+    success, response = exports.ox_inventory:RemoveItem(src, name, 1, metadata, slotId)
+    if success then
+        TriggerClientEvent('QBCore:Notify', src, 'You are not allowed to use this weapon', 'error')
+    else
+        print(src, response, name, "Error removing item")
+    end
 end)
 
 function has_value (tab, val, key)
